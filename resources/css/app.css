@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@source "../views";
+
+[x-cloak] { display: none; }
+
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}

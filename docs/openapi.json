@@ -1,0 +1,83 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Simple Posts API",
+    "version": "1.0.0",
+    "description": "API for fetching a list of posts."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Base API URL"
+    }
+  ],
+  "paths": {
+    "/posts": {
+      "get": {
+        "summary": "Get a list of all posts.",
+        "operationId": "listPosts",
+        "tags": [
+          "Posts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of posts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                },
+                "examples": {
+                  "postsArray": {
+                    "value": [
+                      {
+                        "id": 1,
+                        "title": "Post One",
+                        "summary": "A brief summary of the first post."
+                      },
+                      {
+                        "id": 2,
+                        "title": "Post Two: The Sequel",
+                        "summary": "This is a quick summary for the follow-up article."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "summary"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique identifier for the post."
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the post."
+          },
+          "summary": {
+            "type": "string",
+            "description": "A short abstract or summary of the post content."
+          }
+        }
+      }
+    }
+  }
+}

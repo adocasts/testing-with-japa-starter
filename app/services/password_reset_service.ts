@@ -17,12 +17,14 @@ export default class PasswordResetService {
    * @returns
    */
   async send(email: string) {
+    // find the user and generate a token value
     const user = await User.findBy('email', email)
     const { value, encryptedValue } = PasswordResetToken.generate()
 
     // silently fail if email does not exist
     if (!user) return
 
+    // expire all previous tokens and create a new one
     await this.expireAllForUser(user)
     await PasswordResetToken.create({
       expiresAt: DateTime.now().plus(this.validFor),
@@ -30,12 +32,14 @@ export default class PasswordResetService {
       value,
     })
 
+    // create the password reset link
     const resetLink = router
       .builder()
       .prefixUrl(env.get('APP_URL'))
       .params({ value: encryptedValue })
       .make('auth.password.reset')
 
+    // send the email
     await mail.sendLater((message) => {
       message
         .subject(`Reset your ${app.appName} password`)
@@ -58,6 +62,7 @@ export default class PasswordResetService {
    * @returns
    */
   async reset(encryptedValue: string, password: string) {
+    // verify the token value and get the associated user
     const { isValid, user } = await PasswordResetToken.verify(encryptedValue)
 
     // if the token is invalid or not matched to a user, throw invalid exception
@@ -68,9 +73,11 @@ export default class PasswordResetService {
       })
     }
 
+    // update the user's password and expire all pending tokens
     await user.merge({ password }).save()
     await this.expireAllForUser(user)
 
+    // make a login link
     const loginLink = router.builder().prefixUrl(env.get('APP_URL')).make('auth.login.show')
 
     await mail.sendLater((message) => {
